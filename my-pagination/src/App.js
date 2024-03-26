@@ -1,115 +1,84 @@
-import React, { useState, useEffect } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { useState, useEffect } from "react";
 
-const Table = () => {
-  const [users, setUsers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(10); 
+function App() {
+  const [details, setDetails] = useState([]);
+  const [page, setPage] = useState(1);
+  const fetchData = async () => {
+    try {
+      const resp = await fetch(
+        "https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json"
+      );
+      const data = await resp.json();
+      setDetails(data);
+    } catch (err) {
+      alert("failed to fetch data");
+    }
+  };
 
+  const handleDecrement = () => {
+    if (page === 1) return;
+    setPage((page) => page - 1);
+  };
+
+  const handleIncrement = () => {
+    if (page === Math.ceil(details.length / 10)) return;
+    setPage((page) => page + 1);
+  };
   useEffect(() => {
-    fetch(
-      "https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json"
-    )
-      .then((res) => res.json())
-      .then((data) => setUsers(data));
+    fetchData();
   }, []);
-
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const totalPages = Math.ceil(users.length / usersPerPage);
-
-  const headingStyles = {
-    background: "green",
-    color: "white",
-    fontSize: "18px",
-  };
-
-  const tableStyles = {
-    borderCollapse: "collapse",
-    width: "100%",
-  };
-
-  const tdStyles = {
-    border: "1px solid #dddddd",
-    padding: "8px",
-    textAlign: "left",
-  };
-
-  const thStyles = {
-    border: "1px solid #dddddd",
-    padding: "8px",
-    textAlign: "left",
-  };
-
-  const paginationStyles = {
-    marginTop: "10px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  };
-
-  const buttonStyles = {
-    background: "green",
-    color: "white",
-    border: "none",
-    padding: "5px 10px",
-    borderRadius: "5px",
-    margin: "0 10px",
-  };
-
   return (
     <div>
-      <table style={tableStyles}>
-        <thead style={headingStyles}>
-          <tr>
-            <th style={thStyles}>ID</th>
-            <th style={thStyles}>Name</th>
-            <th style={thStyles}>Email</th>
-            <th style={thStyles}>Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentUsers.map((user) => (
-            <tr key={user.id}>
-              <td style={tdStyles}>{user.id}</td>
-              <td style={tdStyles}>{user.name}</td>
-              <td style={tdStyles}>{user.email}</td>
-              <td style={tdStyles}>{user.role}</td>
+      <div className="App">
+        <h3>Employee Data Table</h3>
+        <table className="table">
+          <thead className="flex-container">
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
             </tr>
+          </thead>
+          {details.slice((page - 1) * 10, page * 10).map((detail, index) => (
+            <tbody key={index}>
+              <tr>
+                <td>{detail.id}</td>
+                <td>{detail.name}</td>
+                <td>{detail.email}</td>
+                <td>{detail.role}</td>
+              </tr>
+            </tbody>
           ))}
-        </tbody>
-      </table>
-      <div style={paginationStyles}>
-        <button
-          style={buttonStyles}
-          onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
-        >
+          {/* {details.map(
+            (detail, index) =>
+              (page - 1) * 10 <= index &&
+              index <= page * 10 - 1 && (
+                <tbody>
+                  <tr>
+                    <td>{detail.id}</td>
+                    <td>{detail.name}</td>
+                    <td>{detail.email}</td>
+                    <td>{detail.role}</td>
+                  </tr>
+                </tbody>
+              )
+          )} */}
+        </table>
+      </div>
+      <div className="buttons">
+        <button type="button" onClick={handleDecrement}>
           Previous
         </button>
-        <span
-          style={{
-            background: "green",
-            padding: "5px 10px",
-            borderRadius: "5px",
-            color: "white",
-          }}
-        >
-          {currentPage}
-        </span>
-        <button
-          style={buttonStyles}
-          onClick={() =>
-            paginate(currentPage < totalPages ? currentPage + 1 : totalPages)
-          }
-        >
+        <div>{page}</div>
+        <button type="button" onClick={handleIncrement}>
           Next
         </button>
       </div>
     </div>
   );
-};
+}
 
-export default Table;
+export default App;
