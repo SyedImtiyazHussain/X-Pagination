@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { useState, useEffect } from "react";
 
@@ -52,20 +51,6 @@ function App() {
               </tr>
             </tbody>
           ))}
-          {/* {details.map(
-            (detail, index) =>
-              (page - 1) * 10 <= index &&
-              index <= page * 10 - 1 && (
-                <tbody>
-                  <tr>
-                    <td>{detail.id}</td>
-                    <td>{detail.name}</td>
-                    <td>{detail.email}</td>
-                    <td>{detail.role}</td>
-                  </tr>
-                </tbody>
-              )
-          )} */}
         </table>
       </div>
       <div className="buttons">
